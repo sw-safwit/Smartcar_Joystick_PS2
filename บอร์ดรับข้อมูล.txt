@@ -1,0 +1,102 @@
+// กำหนดขา Pin
+const int ENA = 5;  // D1
+const int IN1 = 4;  // D2
+const int IN2 = 0;  // D3
+const int IN3 = 2;  // D4
+const int IN4 = 14; // D5
+const int ENB = 12; // D6
+
+void setup() {
+  Serial.begin(115200);
+
+  pinMode(ENA, OUTPUT);
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+  pinMode(ENB, OUTPUT);
+}
+
+void loop() {
+
+  while (Serial.available() > 0) {
+    char c = Serial.read();
+    
+    // ใช้ตัวแปรเก็บข้อความแบบ Static
+    static String inputString = "";
+    
+    if (c == '\n') { // เมื่อจบบรรทัด
+      inputString.trim();
+      executeCommand(inputString);
+      inputString = ""; // ล้างค่ารอรับคำสั่งใหม่
+    } else {
+      inputString += c;
+    }
+  }
+
+}
+
+// แยกฟังก์ชันออกมาเพื่อให้ Loop ทำงานไวขึ้น
+void executeCommand(String data) {
+  if (data == "Up")         moveForward(250);
+  else if (data == "Down")  moveBackward(250);
+  else if (data == "LEFT")  moveLeft(250);
+  else if (data == "Right") moveRight(250);
+  else if (data == "Stop")  stopMotors();
+}
+
+// ฟังก์ชันเดินหน้า
+void moveForward(int speed) {
+  analogWrite(ENA, speed);
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  
+  analogWrite(ENB, speed);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+}
+
+// ฟังก์ชันถอยหลัง
+void moveBackward(int speed) {
+  analogWrite(ENA, speed);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  
+  analogWrite(ENB, speed);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+}
+
+// ฟังก์ชันเลี้ยวซ้าย
+void moveLeft(int speed) {
+  analogWrite(ENA, speed);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  
+  analogWrite(ENB, speed);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+}
+
+// ฟังก์ชันเลี้ยวขวา
+void moveRight(int speed) {
+  analogWrite(ENA, speed);
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  
+  analogWrite(ENB, speed);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+}
+
+// ฟังก์ชันหยุด
+void stopMotors() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+  analogWrite(ENA, 0);
+  analogWrite(ENB, 0);
+}
+
+
